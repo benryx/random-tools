@@ -1,3 +1,14 @@
+/*
+ * This is meant to be used in conjuction with the rat hole macro that I made in
+ * Raptor. Unfortunately Raptor macros are too limited to handle all of this, so
+ * I had to use a hybrid approach. Run the macro first and then use the points
+ * that the macro generated to run this program, and it will give you the point
+ * to finish the puzzle.
+ *
+ * The output of this program is intended to be redirected to your clipboard.
+ * This will contain the x and y values of the point separated by a space.
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,5 +90,8 @@ void print_point(double x, double y, double cx, double cy, double theta) {
         fprintf(stderr, "[%.2f degrees / %.3f]\n", theta, theta / 25.4);
         fprintf(stderr, "%f, %f\n", cx + x, cy + y);
 
+        /* I usually redirect this to the clipboard.
+         * That's why I have everything else going to stderr.
+         */
         fprintf(stdout, "%f %f\n", cx + x, cy + y);
 }

@@ -1,3 +1,9 @@
+/*
+ * Approximate the bend deduction for the given bend angle and plate thickness.
+ * This is just an estimate because I don't actually know the K-factor or the
+ * bend radius.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -9,47 +15,54 @@
 #define K 0.415
 
 int main(int argc, char *argv[]) {
-        double allowance;        /* Bend Allowance */
+        double bend_allowance;
         double bend_angle;
-        double deduction;        /* Bend Deduction */
+        double bend_deduction;
         double deduction_avg = 0;
         double deduction_sum = 0;
         double radii_range[2];
-        double setback;          /* Outside Setback */
-        double thickness;        /* Plate thickness */
+        double outside_setback;
+        double plate_thickness;
 
         int i;
 
         if (argc > 1) {
-                thickness = strtod(argv[1], NULL);
+                plate_thickness = strtod(argv[1], NULL);
         } else {
-                thickness = DEFAULT_THICKNESS;
+                plate_thickness = DEFAULT_THICKNESS;
         }
+
         if (argc > 2) {
                 bend_angle = strtod(argv[2], NULL);
         } else {
                 bend_angle = DEFAULT_ANGLE;
         }
 
-        radii_range[0] = thickness;
-        radii_range[1] = 2 * thickness;
+        radii_range[0] = plate_thickness;
+        radii_range[1] = 2 * plate_thickness;
 
-        printf("\n%16s: %.4g\n", "Plate Thickness", thickness);
+        printf("\n%16s: %.4g\n", "Plate Thickness", plate_thickness);
         printf("%16s: %.4g\n", "Bend Angle (deg)", bend_angle);
-        printf("%16s: %.4g\n", "K-factor", K);
+        printf("\n%s: %.4g\n", "K-factor", K);
 
         printf("\n%7s |%8s%8s%8s\n", "Radius", "BA", "OSSB", "BD");
 
         for (i = 0; i < 2; i++) {
-                double radius = radii_range[i]; /* Bend Radius (Inner) */
-                allowance = bend_angle * PI/180.0 * (radius + K * thickness);
-                setback = (radius + thickness) * tan(bend_angle * PI/180.0 / 2.0);
-                deduction = 2.0 * setback - allowance;
+                /* The (inner) bend radius */
+                double radius = radii_range[i];
 
-                printf("%7.3f |%8.3f%8.3f%8.3f\n", radius, allowance,
-                       setback, deduction);
+                bend_allowance = bend_angle * (
+                        radius + (K * plate_thickness)
+                ) * PI / 180.0;
+                outside_setback = (radius + plate_thickness) * tan(
+                        (bend_angle / 2.0) * (PI / 180.0)
+                );
+                bend_deduction = (2.0 * outside_setback) - bend_allowance;
 
-                deduction_sum += deduction;
+                printf("%7.3f |%8.3f%8.3f%8.3f\n", radius, bend_allowance,
+                       outside_setback, bend_deduction);
+
+                deduction_sum += bend_deduction;
         }
 
         deduction_avg = deduction_sum / 2.0;

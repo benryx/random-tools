@@ -1,3 +1,8 @@
+/*
+ * Estimate how long it will take me to nest some plate, given the quantity and
+ * area of the plate to be nested.
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,14 +17,15 @@ int main(int argc, char *argv[]) {
                 area = strtod(argv[2], NULL);
         } else {
                 printf("Please enter quantity and area (q a): ");
-                scanf("%d %lf", &quantity, &area);
+                scanf("%d%lf", &quantity, &area);
         }
 
+        /* Custom function I discovered gives a good estimate */
         estimate = ceil(5.7 * pow(quantity * area, 0.31) / 15) * 15;
 
         printf("Quantity: %d\n", quantity);
-        printf("Area: %.1lf\n", area);
-        printf("Estimate: %.0lf minutes\n", estimate);
+        printf("Area: %.1f\n", area);
+        printf("Estimate: %.0f minutes\n", estimate);
 
         return 0;
 }

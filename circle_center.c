@@ -1,25 +1,6 @@
-/* Calculate the centers of two possible circles given the radius and two points
- * that lie on the circle.
- */
-
-/* C89 STANDARD HEADERS
- *
- * #include <assert.h>
- * #include <ctype.h>
- * #include <errno.h>
- * #include <float.h>
- * #include <limits.h>
- * #include <locale.h>
- * #include <math.h>
- * #include <setjmp.h>
- * #include <signal.h>
- * #include <stdarg.h>
- * #include <stddef.h>
- * #include <stdio.h>
- * #include <stdlib.h>
- * #include <string.h>
- * #include <time.h>
- *
+/*
+ * Calculate the centers of two possible circles given the radius and two points
+ * that lie on such circles.
  */
 
 #include <math.h>
@@ -68,7 +49,6 @@ int main() {
 
         printf("\nCenter 1: (%f, %f)\n", x3, y3);
         printf("Center 2: (%f, %f)\n", x4, y4);
-
 
         return 0;
 }
