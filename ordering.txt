@@ -1,0 +1,9 @@
+Basic ordering for simple source file:
+
+#include directives
+#define directives
+type definitions
+declarations of external variables
+prototypes for functions other than main
+definition of main
+definitions of other functions
