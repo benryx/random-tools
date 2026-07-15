@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(void) {
         double x1;
@@ -22,5 +23,5 @@ int main(void) {
         printf("Start: %8.3f \t End: %8.3f\n", -(x1 + 0.06), -(x3 - x2 + 0.06));
         printf("Border: %3d\n", (int) (-y));
 
-        return 0;
+        exit(EXIT_SUCCESS);
 }

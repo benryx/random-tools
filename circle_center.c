@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
         double a;
@@ -50,5 +51,5 @@ int main() {
         printf("\nCenter 1: (%f, %f)\n", x3, y3);
         printf("Center 2: (%f, %f)\n", x4, y4);
 
-        return 0;
+        exit(EXIT_SUCCESS);
 }

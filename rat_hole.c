@@ -24,10 +24,10 @@ int main(int argc, char *argv[]) {
         double cx;
         double cy;
         double d2;
-        double pfx;
-        double pfy;
         double pcx;
         double pcy;
+        double pfx;
+        double pfy;
         double theta1;
         double theta2;
         double x0;
@@ -53,11 +53,7 @@ int main(int argc, char *argv[]) {
         }
 
         cx = pcx;
-        if (pfy < pcy) {
-                cy = pcy + R;
-        } else {
-                cy = pcy - R;
-        }
+        cy = (pfy < pcy) ? (pcy + R) : (pcy - R);
 
         x0 = pfx - cx;
         y0 = pfy - cy;
@@ -83,7 +79,7 @@ int main(int argc, char *argv[]) {
                 print_point(x2, y2, cx, cy, theta2);
         }
 
-        return 0;
+        exit(EXIT_SUCCESS);
 }
 
 void print_point(double x, double y, double cx, double cy, double theta) {

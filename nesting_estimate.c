@@ -27,5 +27,5 @@ int main(int argc, char *argv[]) {
         printf("Area: %.1f\n", area);
         printf("Estimate: %.0f minutes\n", estimate);
 
-        return 0;
+        exit(EXIT_SUCCESS);
 }
