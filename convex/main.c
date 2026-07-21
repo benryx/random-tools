@@ -15,6 +15,7 @@ enum action {
         QUIT
 };
 
+int init(SDL_Window **window, SDL_Renderer **renderer);
 enum action handle_events();
 
 int main(void) {
@@ -31,36 +32,12 @@ int main(void) {
         size_t i = 0;
         size_t p_count = 0;
 
-        /*
-         * SDL2 initialization process
-         * (this is the messy section)
-         */
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-                printf("Couldn't initialize SDL: %s\n", SDL_GetError());
-                return 1;
-        }
-
-        window = SDL_CreateWindow("Test", WINDOW_X, WINDOW_Y,
-                                  SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-        if (window == NULL) {
-                printf("Failed to open %dx%d window: %s\n",
-                       SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
-                SDL_Quit();
+        if (!init(&window, &renderer)) {
+                fprintf(stderr, "Initialization failed.\n");
                 exit(EXIT_FAILURE);
         }
 
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        if (renderer == NULL) {
-                printf("Failed to create renderer: %s\n", SDL_GetError());
-                SDL_DestroyWindow(window);
-                SDL_Quit();
-                exit(EXIT_FAILURE);
-        }
-
-
-        while (input_scan != QUIT) {
-                input_scan = handle_events();
-
+        while ((input_scan = handle_events()) != QUIT) {
                 if (input_scan == CLICK) {
                         SDL_GetMouseState(&(points[p_count].x),
                                           &(points[p_count].y));
@@ -104,10 +81,53 @@ int main(void) {
         exit(EXIT_SUCCESS);
 }
 
+
+/*
+ * SDL2 initialization process
+ * SDL_Init, and initializing the window and the renderer.
+ */
+int init(SDL_Window **window, SDL_Renderer **renderer) {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+                fprintf(stderr, "Couldn't initialize SDL: %s\n",
+                        SDL_GetError());
+                return 0;
+        }
+
+        *window = SDL_CreateWindow(
+                "Test",
+                SDL_WINDOWPOS_CENTERED,
+                SDL_WINDOWPOS_CENTERED,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT,
+                SDL_WINDOW_SHOWN
+        );
+        if (*window == NULL) {
+                fprintf(stderr, "Failed to open %dx%d window: %s\n",
+                        SCREEN_WIDTH, SCREEN_HEIGHT, SDL_GetError());
+                SDL_Quit();
+                return 0;
+        }
+
+        *renderer = SDL_CreateRenderer(
+                *window,
+                -1,
+                SDL_RENDERER_ACCELERATED
+        );
+        if (*renderer == NULL) {
+                fprintf(stderr, "Failed to create renderer: %s\n",
+                        SDL_GetError());
+                SDL_DestroyWindow(*window);
+                SDL_Quit();
+                return 0;
+        }
+
+        return 1;
+}
+
 /*
  * Scan through the events to determine if the user is trying to quit or click.
  * They can quit by closing the window or pressing Escape or Q on the keyboard.
- * If they click, then determine where they clicked.
+ * The only other event is a click, otherwise nothing happens.
  *
  * Quit events will immediately return, disregarding all other events.
  */

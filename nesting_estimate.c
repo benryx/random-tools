@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
                 quantity = strtol(argv[1], NULL, 10);
                 area = strtod(argv[2], NULL);
         } else {
-                printf("Please enter quantity and area (q a): ");
+                fprintf(stderr, "Please enter quantity and area (q a): ");
                 scanf("%d%lf", &quantity, &area);
         }
 

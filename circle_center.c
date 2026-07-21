@@ -24,15 +24,15 @@ int main() {
         double y4;
         double ya;
 
-        printf("Enter the first point (x y): ");
+        fprintf(stderr, "Enter the first point (x y): ");
         scanf("%lf %lf", &x1, &y1);
 
-        printf("Enter the second point (x y): ");
+        fprintf(stderr, "Enter the second point (x y): ");
         scanf("%lf %lf", &x2, &y2);
 
         a = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) / 2.0;
 
-        printf("Enter the radius (min. %.4f): ", a);
+        fprintf(stderr, "Enter the radius (min. %.4f): ", a);
         scanf("%lf", &radius);
 
         b = sqrt(radius * radius - a * a);

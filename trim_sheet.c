@@ -11,13 +11,13 @@ int main(void) {
         double x3;
         double y;
 
-        printf("Point on left line (x y): ");
+        fprintf(stderr, "Point on left line (x y): ");
         scanf("%lf %lf", &x1, &y);
 
-        printf("Right line (x): ");
+        fprintf(stderr, "Right line (x): ");
         scanf("%lf", &x2);
 
-        printf("Rightmost edge of sheet (x): ");
+        fprintf(stderr, "Rightmost edge of sheet (x): ");
         scanf("%lf", &x3);
 
         printf("Start: %8.3f \t End: %8.3f\n", -(x1 + 0.06), -(x3 - x2 + 0.06));
