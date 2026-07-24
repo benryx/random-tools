@@ -26,10 +26,8 @@ int main(int argc, char *argv[]) {
         double radius;
         int i;
 
-        if (argc > 1) {
+        if (argc == 3) {
                 plate_thickness = strtod(argv[1], NULL);
-        }
-        if (argc > 2) {
                 bend_angle = strtod(argv[2], NULL);
         }
 

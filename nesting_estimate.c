@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
         double estimate;
         int quantity;
 
-        if (argc > 2) {
+        if (argc == 3) {
                 quantity = strtol(argv[1], NULL, 10);
                 area = strtod(argv[2], NULL);
         } else {
