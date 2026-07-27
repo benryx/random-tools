@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_FILEPATH_SIZE 64
+#define QUERY_FILENAME "code/c/sql/query.sql"
 #define QUERY_LENGTH 1280
-#define QUERY_FILENAME "/home/benry/code/c/sql/query.sql"
 
 int main(int argc, char *argv[]) {
         RETCODE rc;
@@ -30,6 +31,7 @@ int main(int argc, char *argv[]) {
 
         FILE *fp;
         char *query_format;
+        char query_filepath[MAX_FILEPATH_SIZE];
         int c;
         int i;
 
@@ -38,9 +40,12 @@ int main(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
         }
 
-        if ((fp = fopen(QUERY_FILENAME, "r")) == NULL) {
-                printf("Can't open %s for reading.\n", QUERY_FILENAME);
+        sprintf(query_filepath, "%s/%s", getenv("HOME"), QUERY_FILENAME);
+        if ((fp = fopen(query_filepath, "r")) == NULL) {
+                fprintf(stderr, "Can't open %s for reading.\n", query_filepath);
                 exit(EXIT_FAILURE);
+        } else {
+
         }
 
         for (i = 0; (c = getc(fp)) != EOF && i < QUERY_LENGTH; i++) {
