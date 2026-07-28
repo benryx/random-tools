@@ -18,7 +18,7 @@ void encode(void);
 void decode(void);
 int read_lexicon(void);
 size_t read_words(void);
-void find_indices(void);
+size_t find_indices(void);
 int save_lexicon(void);
 
 int main(void) {
@@ -48,7 +48,7 @@ void encode(void) {
         size_t i;
 
         if (read_lexicon()) {
-                fprintf(stderr, "Successfully read lexicon from file!\n");
+                fprintf(stderr, "[Successfully read lexicon from file.]\n");
         }
 
         read_words();
@@ -59,7 +59,9 @@ void encode(void) {
                 fprintf(stderr, "%3ld: %s\n", indices[i], lexicon[indices[i]]);
         }
 
-        save_lexicon();
+        if (save_lexicon()) {
+                fprintf(stderr, "[Successfully wrote lexicon to file.]\n");
+        }
 
         return;
 }
@@ -151,28 +153,29 @@ size_t read_words() {
         return n_words;
 }
 
-void find_indices(void) {
-        int found;
+size_t find_indices(void) {
+        size_t max_index = 0;
         size_t i = 0;
         size_t j = 0;
 
         for (i = 0; words[i] != NULL; i++) {
-                found = 0;
-
-                for (j = 0; *lexicon[j] != '\0'; j++) {
-                        if (strcmp(words[i], lexicon[j]) == 0) {
-                                indices[i] = j;
-                                found = 1;
+                for (j = 0; j < MAX_LEXICON_SIZE; j++) {
+                        if (*lexicon[j] == '\0') {
+                                strcpy(lexicon[j], words[i]);
+                                break;
+                        } else if (strcmp(words[i], lexicon[j]) == 0) {
                                 break;
                         }
                 }
-                if (!found) {
-                        strcpy(lexicon[j], words[i]);
-                        indices[i] = j;
+
+                indices[i] = j;
+
+                if (j > max_index) {
+                        max_index = j;
                 }
         }
 
-        return;
+        return max_index;
 }
 
 int save_lexicon(void) {
