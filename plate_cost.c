@@ -10,8 +10,8 @@ int main(int argc, char *argv[]) {
         double dollars_per_pound = 1.75;
 
         double thickness;
-        int length;
-        int width;
+        double length;
+        double width;
 
         double weight;
         double cost;
@@ -19,19 +19,19 @@ int main(int argc, char *argv[]) {
 
         if (argc == 4) {
                 thickness = strtod(argv[1], NULL);
-                length = strtol(argv[2], NULL, 10);
-                width = strtol(argv[3], NULL, 10);
+                length = strtod(argv[2], NULL);
+                width = strtod(argv[3], NULL);
         } else {
                 fprintf(stderr, "Enter plate dimensions (T L W): ");
-                scanf("%lf%d%d", &thickness, &length, &width);
+                scanf("%lf%lf%lf", &thickness, &length, &width);
         }
 
         weight = density * thickness * length * width;
         cost = weight * dollars_per_pound;
         hours = cost / HOURLY_RATE;
 
-        printf("\n%.1f lbs\n", weight);
-        printf("Cost = $%.0f (%.1f hrs)\n\n", cost, hours);
+        printf("\n%.2f lbs\n", weight);
+        printf("Cost = $%.2f (%.2f hrs)\n\n", cost, hours);
 
         exit(EXIT_SUCCESS);
 }
