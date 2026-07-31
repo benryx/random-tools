@@ -60,15 +60,20 @@ void encode(void) {
 
         n_words = read_words();
 
-        max_index = find_indices(n_words);
+        fprintf(stderr, "Tokens: %d\n", n_words);
 
+        max_index = find_indices(n_words);
         max_width = bit_width(max_index);
         fprintf(stderr, "Max Bit Width: %d\n", max_width);
 
         fill_binary(max_width, n_words);
 
         for (i = 0; i < n_words; i++) {
-                fprintf(stderr, "[%2ld] %s: %s\n", indices[i], binary[i], lexicon[indices[i]]);
+                fprintf(stderr, "[%2ld] %s: %s\n",
+                        indices[i],
+                        binary[i],
+                        lexicon[indices[i]]
+                );
         }
 
         if (!save_lexicon()) {
@@ -233,7 +238,7 @@ int bit_width(size_t number) {
         int width;
 
         for (width = 0; number != 0; width++) {
-                number >>= 1; 
+                number >>= 1;
         }
 
         return width;
