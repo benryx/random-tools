@@ -8,18 +8,22 @@
 #define MAX_LEXICON_SIZE 0xFFFFF
 #define MAX_WORDS 64
 #define MAX_WORD_SIZE 64
+#define MAX_BIN_WIDTH 20
 
 char lexicon[MAX_LEXICON_SIZE][MAX_WORD_SIZE + 1];
 char line[MAX_WORDS * (MAX_WORD_SIZE + 1)];
 char *words[MAX_WORDS];
 size_t indices[MAX_WORDS];
+char binary[MAX_WORDS][MAX_BIN_WIDTH + 1];
 
 void encode(void);
 void decode(void);
 int read_lexicon(void);
-size_t read_words(void);
-size_t find_indices(void);
+int read_words(void);
+size_t find_indices(int n_words);
 int save_lexicon(void);
+void fill_binary(int width, int n_words);
+int bit_width(size_t number);
 
 int main(void) {
         /*int choice;
@@ -45,22 +49,30 @@ int main(void) {
 }
 
 void encode(void) {
-        size_t i;
+        int n_words;
+        size_t max_index;
+        int max_width;
+        int i;
 
-        if (read_lexicon()) {
-                fprintf(stderr, "[Successfully read lexicon from file.]\n");
+        if (!read_lexicon()) {
+                fprintf(stderr, "Failed to read lexicon from file.\n");
         }
 
-        read_words();
+        n_words = read_words();
 
-        find_indices();
+        max_index = find_indices(n_words);
 
-        for (i = 0; words[i] != NULL; i++) {
-                fprintf(stderr, "%3ld: %s\n", indices[i], lexicon[indices[i]]);
+        max_width = bit_width(max_index);
+        fprintf(stderr, "Max Bit Width: %d\n", max_width);
+
+        fill_binary(max_width, n_words);
+
+        for (i = 0; i < n_words; i++) {
+                fprintf(stderr, "[%2ld] %s: %s\n", indices[i], binary[i], lexicon[indices[i]]);
         }
 
-        if (save_lexicon()) {
-                fprintf(stderr, "[Successfully wrote lexicon to file.]\n");
+        if (!save_lexicon()) {
+                fprintf(stderr, "Failed to write lexicon to file.\n");
         }
 
         return;
@@ -74,7 +86,7 @@ int read_lexicon() {
         FILE *fp;
         char filepath[MAX_FILEPATH_SIZE];
         char *lp;
-        size_t i;
+        int i;
 
         sprintf(filepath, "%s/%s", getenv("HOME"), LEXICON_FILENAME);
 
@@ -105,60 +117,60 @@ int read_lexicon() {
         return 1;
 }
 
-size_t read_words() {
-        char *bp;
-        size_t n_words = 0;
+int read_words() {
+        char *p;
+        int n_words = 0;
 
         if ((fgets(line, sizeof(line), stdin)) != NULL) {
-                bp = line;
+                p = line;
 
-                while (*bp != '\0') {
+                while (*p != '\0') {
                         /* Skip leading whitespace */
                         while (
-                                *bp == ' ' ||
-                                *bp == '\t' ||
-                                *bp == '\n'
+                                *p == ' ' ||
+                                *p == '\t' ||
+                                *p == '\n'
                         ) {
-                                bp++;
+                                p++;
                         }
 
                         /* If at null character, then we're done */
-                        if (*bp == '\0') {
+                        if (*p == '\0') {
                                 break;
                         }
 
                         /* Otherwise, we are at the start of a word */
-                        words[n_words++] = bp;
+                        words[n_words++] = p;
 
                         /* Skip until whitespace or null */
                         while (
-                                *bp != ' ' &&
-                                *bp != '\t' &&
-                                *bp != '\n' &&
-                                *bp != '\0'
+                                *p != ' ' &&
+                                *p != '\t' &&
+                                *p != '\n' &&
+                                *p != '\0'
                         ) {
-                                bp++;
+                                p++;
                         }
 
                         /* If at null character, then we're done */
-                        if (*bp == '\0') {
+                        if (*p == '\0') {
                                 break;
                         }
 
-                        /* Otherwise, mark end of this word */
-                        *bp++ = '\0';
+                        /* Otherwise, mark end of this word, and advance */
+                        *p++ = '\0';
                 }
         }
 
         return n_words;
 }
 
-size_t find_indices(void) {
+size_t find_indices(int n_words) {
+        int i;
+        size_t j;
         size_t max_index = 0;
-        size_t i = 0;
-        size_t j = 0;
 
-        for (i = 0; words[i] != NULL; i++) {
+        for (i = 0; i < n_words; i++) {
                 for (j = 0; j < MAX_LEXICON_SIZE; j++) {
                         if (*lexicon[j] == '\0') {
                                 strcpy(lexicon[j], words[i]);
@@ -197,4 +209,32 @@ int save_lexicon(void) {
         fclose(fp);
 
         return 1;
+}
+
+void fill_binary(int width, int n_words) {
+        size_t number;
+        int i;
+        int j;
+
+        for (i = 0; i < n_words; i++) {
+                number = indices[i];
+
+                binary[i][width] = '\0';
+                for (j = width - 1; j >= 0; j--) {
+                        binary[i][j] = (number & 1) + '0';
+                        number >>= 1;
+                }
+        }
+
+        return;
+}
+
+int bit_width(size_t number) {
+        int width;
+
+        for (width = 0; number != 0; width++) {
+                number >>= 1; 
+        }
+
+        return width;
 }
