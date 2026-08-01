@@ -15,6 +15,7 @@ char line[MAX_WORDS * (MAX_WORD_SIZE + 1)];
 char *words[MAX_WORDS];
 size_t indices[MAX_WORDS];
 char binary[MAX_WORDS][MAX_BIN_WIDTH + 1];
+char combined[MAX_WORDS * MAX_BIN_WIDTH + 1];
 
 void encode(void);
 void decode(void);
@@ -24,6 +25,7 @@ size_t find_indices(int n_words);
 int save_lexicon(void);
 void fill_binary(int width, int n_words);
 int bit_width(size_t number);
+void interleave(void);
 
 int main(void) {
         /*int choice;
@@ -60,21 +62,26 @@ void encode(void) {
 
         n_words = read_words();
 
-        fprintf(stderr, "Tokens: %d\n", n_words);
+        printf("Tokens: %d\n", n_words);
 
         max_index = find_indices(n_words);
         max_width = bit_width(max_index);
-        fprintf(stderr, "Max Bit Width: %d\n", max_width);
+        printf("Max Bit Width: %d\n", max_width);
 
         fill_binary(max_width, n_words);
 
         for (i = 0; i < n_words; i++) {
-                fprintf(stderr, "[%2ld] %s: %s\n",
-                        indices[i],
-                        binary[i],
-                        lexicon[indices[i]]
+                printf("[%2ld, %2lx] %s: %s\n",
+                       indices[i],
+                       indices[i],
+                       binary[i],
+                       lexicon[indices[i]]
                 );
         }
+
+        interleave();
+
+        printf("Combined binary:\n\t%s\n", combined);
 
         if (!save_lexicon()) {
                 fprintf(stderr, "Failed to write lexicon to file.\n");
@@ -242,4 +249,19 @@ int bit_width(size_t number) {
         }
 
         return width;
+}
+ 
+void interleave(void) {
+        char *cp = combined;
+        int r;
+        int c;
+
+        for (r = 0, c = 0; binary[r][c] != '\0'; c++) {
+                for (r = 0; binary[r][c] != '\0'; r++) {
+                        *cp++ = binary[r][c];
+                }
+                r = 0;
+        }
+
+        *cp = '\0';
 }
