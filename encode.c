@@ -9,6 +9,7 @@
 #define MAX_WORDS 64
 #define MAX_WORD_SIZE 64
 #define MAX_BIN_WIDTH 20
+#define MAX_RESULT_SIZE 32
 
 char lexicon[MAX_LEXICON_SIZE][MAX_WORD_SIZE + 1];
 char line[MAX_WORDS * (MAX_WORD_SIZE + 1)];
@@ -16,6 +17,7 @@ char *words[MAX_WORDS];
 size_t indices[MAX_WORDS];
 char binary[MAX_WORDS][MAX_BIN_WIDTH + 1];
 char combined[MAX_WORDS * MAX_BIN_WIDTH + 1];
+char result[MAX_RESULT_SIZE];
 
 void encode(void);
 void decode(void);
@@ -23,9 +25,10 @@ int read_lexicon(void);
 int read_words(void);
 size_t find_indices(int n_words);
 int save_lexicon(void);
-void fill_binary(int width, int n_words);
+void fill_binary(int n_words, int width);
 int bit_width(size_t number);
-void interleave(void);
+void interleave(int n_words, int width);
+void compute_result(void);
 
 int main(void) {
         /*int choice;
@@ -68,10 +71,10 @@ void encode(void) {
         max_width = bit_width(max_index);
         printf("Max Bit Width: %d\n", max_width);
 
-        fill_binary(max_width, n_words);
+        fill_binary(n_words, max_width);
 
         for (i = 0; i < n_words; i++) {
-                printf("[%2ld, %2lx] %s: %s\n",
+                printf("[%3ld,%3lx] %s: %s\n",
                        indices[i],
                        indices[i],
                        binary[i],
@@ -79,9 +82,13 @@ void encode(void) {
                 );
         }
 
-        interleave();
+        interleave(n_words, max_width);
 
         printf("Combined binary:\n\t%s\n", combined);
+
+        compute_result();
+
+        printf("Final result: %s\n", result);
 
         if (!save_lexicon()) {
                 fprintf(stderr, "Failed to write lexicon to file.\n");
@@ -223,7 +230,7 @@ int save_lexicon(void) {
         return 1;
 }
 
-void fill_binary(int width, int n_words) {
+void fill_binary(int n_words, int width) {
         size_t number;
         int i;
         int j;
@@ -251,17 +258,43 @@ int bit_width(size_t number) {
         return width;
 }
  
-void interleave(void) {
+void interleave(int n_words, int width) {
         char *cp = combined;
+        int x;
         int r;
         int c;
 
-        for (r = 0, c = 0; binary[r][c] != '\0'; c++) {
-                for (r = 0; binary[r][c] != '\0'; r++) {
+        /* Pad with zeros in the front until it's a multiple of 4 */
+        x = n_words * width;
+        while (x++ % 4 != 0) {
+                *cp++ = '0';
+        }
+
+        for (c = 0; c < width; c++) {
+                for (r = 0; r < n_words; r++) {
                         *cp++ = binary[r][c];
                 }
-                r = 0;
         }
 
         *cp = '\0';
+}
+
+void compute_result(void) {
+        char *cp = combined;
+        char *rp = result;
+        unsigned char hex;
+        int i;
+
+        while (*cp != '\0') {
+                hex = 0;
+
+                for (i = 0; i < 4; i++) {
+                        if (*cp == '\0') {
+                                break;
+                        }
+                        hex = (hex << 1) | (*cp++ - '0');
+                }
+                i = 0;
+                sprintf(rp++, "%x", hex);
+        }
 }
