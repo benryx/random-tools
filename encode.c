@@ -18,6 +18,7 @@ size_t indices[MAX_WORDS];
 char binary[MAX_WORDS][MAX_BIN_WIDTH + 1];
 char combined[MAX_WORDS * MAX_BIN_WIDTH + 1];
 char result[MAX_RESULT_SIZE];
+unsigned char bytes[MAX_WORDS * MAX_BIN_WIDTH / 8];
 
 void encode(void);
 void decode(void);
@@ -28,7 +29,7 @@ int save_lexicon(void);
 void fill_binary(int n_words, int width);
 int bit_width(size_t number);
 void interleave(int n_words, int width);
-void compute_result(void);
+int result_to_bytes(void);
 
 int main(void) {
         /*int choice;
@@ -58,6 +59,7 @@ void encode(void) {
         size_t max_index;
         int max_width;
         int i;
+        int n_bytes;
 
         if (!read_lexicon()) {
                 fprintf(stderr, "Failed to read lexicon from file.\n");
@@ -86,9 +88,13 @@ void encode(void) {
 
         printf("Combined binary:\n\t%s\n", combined);
 
-        compute_result();
+        n_bytes = result_to_bytes();
 
-        printf("Final result: %s\n", result);
+        printf("Final result:\n\t");
+        for (i = 0; i < n_bytes; i++) {
+                printf("%02x ", bytes[i]);
+        }
+        printf("\n");
 
         if (!save_lexicon()) {
                 fprintf(stderr, "Failed to write lexicon to file.\n");
@@ -257,16 +263,19 @@ int bit_width(size_t number) {
 
         return width;
 }
- 
+
 void interleave(int n_words, int width) {
         char *cp = combined;
         int x;
         int r;
         int c;
 
-        /* Pad with zeros in the front until it's a multiple of 4 */
+        /*
+         * Pad with zeros in the front until it's a multiple of 8.
+         * So then we can split it up into bytes.
+         */
         x = n_words * width;
-        while (x++ % 4 != 0) {
+        while (x++ % 8 != 0) {
                 *cp++ = '0';
         }
 
@@ -279,22 +288,24 @@ void interleave(int n_words, int width) {
         *cp = '\0';
 }
 
-void compute_result(void) {
+int result_to_bytes(void) {
         char *cp = combined;
-        char *rp = result;
-        unsigned char hex;
+        unsigned char byte;
         int i;
+        int n_bytes = 0;
 
         while (*cp != '\0') {
-                hex = 0;
+                byte = 0;
 
-                for (i = 0; i < 4; i++) {
+                for (i = 0; i < 8; i++) {
                         if (*cp == '\0') {
                                 break;
                         }
-                        hex = (hex << 1) | (*cp++ - '0');
+                        byte = (byte << 1) | (*cp++ - '0');
                 }
-                i = 0;
-                sprintf(rp++, "%x", hex);
+
+                bytes[n_bytes++] = byte;
         }
+
+        return n_bytes;
 }

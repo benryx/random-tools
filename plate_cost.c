@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
         cost = weight * dollars_per_pound;
         hours = cost / HOURLY_RATE;
 
-        printf("\n%.2f lbs\n", weight);
-        printf("Cost = $%.2f [%.0fh %dm]\n\n",
+        printf("Weight: %.2f lbs\n", weight);
+        printf("Cost: $%.2f [%.0fh %dm]\n",
                cost, hours, (int)(hours * 60) % 60);
 
         exit(EXIT_SUCCESS);
