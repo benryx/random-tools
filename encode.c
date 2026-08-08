@@ -21,7 +21,7 @@ void decode(void);
 int read_lexicon(void);
 int read_tokens(void);
 unsigned long find_indices(int n_tokens);
-void print_binary(unsigned long number);
+void print_binary(unsigned long number, int width);
 int interleave(int n_tokens);
 int save_lexicon(void);
 
@@ -64,7 +64,7 @@ void encode(void) {
         find_indices(n_tokens);
 
         for (i = 0; i < n_tokens; i++) {
-                print_binary(indices[i]);
+                print_binary(indices[i], 8);
                 printf(" [%3ld,%3lx]: %s\n",
                        indices[i],
                        indices[i],
@@ -198,12 +198,16 @@ unsigned long find_indices(int n_tokens) {
         return max_index;
 }
 
-void print_binary(unsigned long number) {
+void print_binary(unsigned long number, int width) {
+        int i;
+
+        /*
         if (!number) {
                 putchar('0');
         }
+        */
 
-        while (number) {
+        for (i = 0; i < width; i++) {
                 putchar((number & 1) + '0');
                 number >>= 1;
         }
@@ -213,26 +217,25 @@ void print_binary(unsigned long number) {
 
 int interleave(int n_tokens) {
         unsigned char *bp = bytes;
-        int i = 0;
         int n_bits = 0;
-        int remaining = n_tokens;
-        int shift = 0;
+        int remaining = 1;
+        int shift;
+        int i;
 
-        while (remaining) {
-                if (!(indices[i] >> shift)) {
-                        remaining--;
-                }
+        for (shift = 0; remaining; shift++) {
+                remaining = 0;
+                for (i = 0; i < n_tokens; i++) {
+                        if (indices[i] >> shift) {
+                                remaining = 1;
+                        }
 
-                *bp = (*bp << 1) | ((indices[i] >> shift) & 1);
+                        *bp = (*bp << 1) | ((indices[i] >> shift) & 1);
+                        n_bits++;
 
-                if (++n_bits == 8) {
-                        bp++;
-                        n_bits = 0;
-                }
-
-                if (++i == n_tokens) {
-                        i = 0;
-                        shift++;
+                        if (n_bits == 8) {
+                                bp++;
+                                n_bits = 0;
+                        }
                 }
         }
 
